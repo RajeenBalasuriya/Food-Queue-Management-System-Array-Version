@@ -31,9 +31,7 @@ public class Main {
         queuePlan[1] = new String[3];
         queuePlan[2] = new String[5];
 
-        queuePlan[1][2]="susan";
-        queuePlan[1][0]="susan";
-        queuePlan[1][1]="susan";
+        
 
 
 
