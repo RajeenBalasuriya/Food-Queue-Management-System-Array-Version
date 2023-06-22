@@ -31,6 +31,9 @@ public class Main {
         queuePlan[1] = new String[3];
         queuePlan[2] = new String[5];
 
+        
+
+
 
         String choice = displayMenu(menuOptions, scan);//getting the user choice
 
@@ -41,11 +44,14 @@ public class Main {
                 case "100":
                     //1 option
                     printingQue(queuePlan);
+                    break;
 
 
                 case "VEQ":
                 case "101":
                     //2 option
+                    viewAllEmptyQueues(queuePlan);
+                    break;
 
                 case "ACQ":
                 case "102":
@@ -123,17 +129,13 @@ public class Main {
 
     private static void printingQue(String[][] queuePlan) {
         //following for-loop will print cashier area
-        for(int i=0;i<3;i++){
-            if(i==0||i==2){
+        for (int i = 0; i < 3; i++) {
+            if (i == 0 || i == 2) {
                 System.out.println("  *******************");
-            }
-            else{
+            } else {
                 System.out.println("  *     Cashier     *");
             }
         }
-
-
-
 
         //following nested for-loops will print queues
         for (int i = 0; i < 5; i++) {
@@ -147,21 +149,34 @@ public class Main {
                         }
                     } catch (ArrayIndexOutOfBoundsException ex) {
                         System.out.print("      ");//this will add spaces when there is no spaces in a queue
-
                     }
-
-
                 }
                 System.out.println();
 
             } catch (ArrayIndexOutOfBoundsException e) {
                 System.out.println("      ");//this will cause to go to new line when exception occur at end of a horizontal row
-
-
             }
         }
 
 
     }
+
+    private static void viewAllEmptyQueues(String[][] queuePlan) {
+        System.out.print("Empty queues at the moment  :");
+        for(int i=0;i<3;i++){
+            for(int j=0;j<queuePlan[i].length;j++){
+                if(queuePlan[i][j]==null) {
+                    System.out.print(i+1+" ");
+                    break; //will stop checking further in that queue and move for next queue
+                }
+            }
+        }
+        System.out.println();
+
+
+        }
+
+
+
 
 }
