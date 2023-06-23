@@ -31,8 +31,8 @@ public class Main {
         queuePlan[1] = new String[3];
         queuePlan[2] = new String[5];
 
-        
-
+        //array will help to reuse details get from VEQ function
+        int[] emptyQueues = new int[3];
 
 
         String choice = displayMenu(menuOptions, scan);//getting the user choice
@@ -50,12 +50,18 @@ public class Main {
                 case "VEQ":
                 case "101":
                     //2 option
-                    viewAllEmptyQueues(queuePlan);
+                    viewAllEmptyQueues(queuePlan, emptyQueues);
                     break;
 
                 case "ACQ":
                 case "102":
                     //3 option
+                    viewAllEmptyQueues(queuePlan, emptyQueues);
+                    System.out.print("Please enter the queue :");
+                    int queueNumber = scan.nextInt();
+                    scan.nextLine();
+                    addCustomerToQueue(queueNumber, emptyQueues, scan, queuePlan);
+
 
                 case "RCQ":
                 case "103":
@@ -161,12 +167,14 @@ public class Main {
 
     }
 
-    private static void viewAllEmptyQueues(String[][] queuePlan) {
+    private static void viewAllEmptyQueues(String[][] queuePlan, int[] emptyQueues) {
         System.out.print("Empty queues at the moment  :");
-        for(int i=0;i<3;i++){
-            for(int j=0;j<queuePlan[i].length;j++){
-                if(queuePlan[i][j]==null) {
-                    System.out.print(i+1+" ");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < queuePlan[i].length; j++) {
+                if (queuePlan[i][j] == null) {
+                    System.out.print(i + 1 + " ");
+                    emptyQueues[i] = i + 1;
+
                     break; //will stop checking further in that queue and move for next queue
                 }
             }
@@ -174,9 +182,31 @@ public class Main {
         System.out.println();
 
 
+    }
+
+    private static void addCustomerToQueue(int queueNumber, int[] emptyQueues, Scanner scan, String[][] queuePlan) {
+
+
+        for (int i = 0; i < 3; i++) {
+            if (queueNumber == emptyQueues[i]) {
+                System.out.print("Enter your name :");
+                String name = scan.nextLine();//getting the username if and only if the queue has an empty space
+
+                for (int j = 0; j < queuePlan[i].length; j++) {
+                    if (queuePlan[i][j] == null) {
+                        queuePlan[i][j] = name;//adding to the last of a particular queue
+                        System.out.println("You have been added to the " + (i + 1) + "  queue " + (j + 1) + "  place");
+                        break;
+
+                    }
+                }
+
+            }
+
         }
 
 
+    }
 
 
 }
