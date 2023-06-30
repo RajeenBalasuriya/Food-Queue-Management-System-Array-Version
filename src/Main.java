@@ -1,4 +1,7 @@
+import java.io.InputStream;
+import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class Main {
     public static void main(String[] args) {
@@ -56,11 +59,9 @@ public class Main {
                 case "ACQ":
                 case "102":
                     //3 option
-                    viewAllEmptyQueues(queuePlan, emptyQueues);
-                    System.out.print("Please enter the queue :");
-                    int queueNumber = scan.nextInt();
-                    scan.nextLine();
-                    addCustomerToQueue(queueNumber, emptyQueues, scan, queuePlan);
+                    viewAllEmptyQueues(queuePlan, emptyQueues);//this method is called here to update emptyQueue array
+                    addCustomerToQueue(emptyQueues, scan, queuePlan);//this will add the customer to queue
+                    break;
 
 
                 case "RCQ":
@@ -169,14 +170,13 @@ public class Main {
 
     private static void viewAllEmptyQueues(String[][] queuePlan, int[] emptyQueues) {
         System.out.print("Empty queues at the moment  :");
+        //following for-loop will check the last place of each queue to make sure the queue is empty
         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < queuePlan[i].length; j++) {
-                if (queuePlan[i][j] == null) {
-                    System.out.print(i + 1 + " ");
-                    emptyQueues[i] = i + 1;
-
-                    break; //will stop checking further in that queue and move for next queue
-                }
+            if (queuePlan[i][(queuePlan[i].length - 1)] == null) {
+                System.out.print((i + 1) + " ");
+                emptyQueues[i] = i + 1;//adding the empty queue to array
+            } else {
+                emptyQueues[i] = 0;//will hold 0 for relevant queue if not empty
             }
         }
         System.out.println();
@@ -184,25 +184,63 @@ public class Main {
 
     }
 
-    private static void addCustomerToQueue(int queueNumber, int[] emptyQueues, Scanner scan, String[][] queuePlan) {
+    private static void addCustomerToQueue(int[] emptyQueues, Scanner scan, String[][] queuePlan) {
+        boolean match;//this variable is used to decide weather program should go for next iteration when needed
+        boolean contains; //this variable is used to find that entered array is empty or not
+
+        do {
+            try {
+                match = false;
+                System.out.println("Enter queue number: ");
+                int queueNumber = scan.nextInt();
 
 
-        for (int i = 0; i < 3; i++) {
-            if (queueNumber == emptyQueues[i]) {
-                System.out.print("Enter your name :");
-                String name = scan.nextLine();//getting the username if and only if the queue has an empty space
+                contains = IntStream.of(emptyQueues).anyMatch((x -> x == queueNumber));
 
-                for (int j = 0; j < queuePlan[i].length; j++) {
-                    if (queuePlan[i][j] == null) {
-                        queuePlan[i][j] = name;//adding to the last of a particular queue
-                        System.out.println("You have been added to the " + (i + 1) + "  queue " + (j + 1) + "  place");
-                        break;
+                //implementation of the functionality of the method through adding process method
+                if (contains) {
 
+                    addingProcess(queueNumber, queuePlan, scan);
+
+                }
+
+                //else block will handle the input validation
+                else {
+                    System.out.println("This queue is empty ! would you like to try another queue ?(Y/N)");
+                    String choice = scan.next().toUpperCase();
+
+                    //while loop is used to validate input when an invalid option is given
+                    while (!choice.equals("Y") && !choice.equals("N")) {
+                        System.out.println("Please enter a valid option!");
+                        choice = scan.next().toUpperCase();
+
+                    }
+                    if (choice.equals("Y")) {
+                        match = true;//will go for next iteration
                     }
                 }
 
+
+            } catch (InputMismatchException e) {
+                System.out.println("youe enterd an invalid input");
+                match = true;
             }
 
+        } while (match);
+
+
+    }
+
+    private static void addingProcess(int queueNumber, String[][] queuePlan, Scanner scan) {
+
+        System.out.println("Please enter your name :");
+        String name = scan.next();
+
+        for (int i = 0; i < (queuePlan[queueNumber - 1].length); i++) {
+            if (queuePlan[queueNumber - 1][i] == null) {
+                queuePlan[queueNumber - 1][i] = name;//making the position occupied
+                break;
+            }
         }
 
 
@@ -210,3 +248,4 @@ public class Main {
 
 
 }
+
