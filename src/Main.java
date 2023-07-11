@@ -81,6 +81,7 @@ public class Main {
                 case "VCS":
                 case "105": {
                     //6 option
+                    sortCustomers(queuePlan);
                 }
 
                 case "SPD":
@@ -297,6 +298,56 @@ public class Main {
         queuePlan[queueNum - 1][queuePlan[queueNum - 1].length - 1] = null;//setting the last place of queue to empty
 
 
+    }
+
+    private static void sortCustomers(String[][] queuePlan) {
+
+        String[] customerNames = new String[10];//array to store names
+        int nameIndex = 0;//track the current position of customerNames array
+
+        //nested for-loop to loop through the multidimensional array to get customer names to customerNames array-list
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < queuePlan[i].length; j++) {
+                if (!(queuePlan[i][j] == null)) {
+                    customerNames[nameIndex] = queuePlan[i][j];
+                    nameIndex++;
+                }
+            }
+        }
+
+        //following nested for-loop is used to travel through the customerNames array and sort it.
+
+        for (int i = 0; i < customerNames.length; i++) {
+            for (int j = i + 1; j < customerNames.length; j++) {
+                if (!(customerNames[j] == null)) {
+
+                    if (customerNames[i].compareTo(customerNames[j]) > 0) {
+
+                        String temp = customerNames[i];
+                        customerNames[i] = customerNames[j];
+                        customerNames[j] = temp;
+                    }
+
+                } else {
+                    break;//will break the inner iteration when no names are found in the array
+                }
+            }
+            if (customerNames[i] == null) {
+                break;//will break the outer iteration when no names are found in the array
+            }
+        }
+        //following enhance for loop will print the  sorted customers
+        System.out.println("Customers sorted by name");
+
+
+        for (String name : customerNames) {
+            if (name == null) {
+                break;
+            } else {
+                System.out.println("    " +name);
+
+            }
+        }
     }
 
 
