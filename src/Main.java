@@ -1,3 +1,6 @@
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.stream.IntStream;
@@ -79,12 +82,12 @@ public class Main {
 
                     removeCustomer(scan, queuePlan);
                     break;
-                    //4 option
+
                 }
 
                 case "PCQ":
                 case "104": {
-                    removeServedCustomer(scan, queuePlan, burgerCount, removedCustomers, count);
+                    burgerCount = removeServedCustomer(scan, queuePlan, burgerCount, removedCustomers, count);
                     break;
 
                 }
@@ -94,26 +97,35 @@ public class Main {
                     //6 option
                     sortCustomers(queuePlan);
                     break;
-                    
+
                 }
 
                 case "SPD":
                 case "106": {
                     //7 option
+                    storeDataToFile(queuePlan, burgerCount);
+                    break;
                 }
 
                 case "LPD":
                 case "107": {
                     //8 option
+                    burgerCount = loadProgram(queuePlan);
+                    break;
                 }
 
                 case "STK":
                 case "108":
-                    //9 option
+
+                    System.out.println("Burger stock has " + burgerCount + " burgers");
+                    break;
 
                 case "AFS":
                 case "109": {
-                    //10 option
+
+                    addBurgersToStock(scan);
+                    break;
+
                 }
 
                 default: {
@@ -174,9 +186,9 @@ public class Main {
                 for (int j = 0; j < 3; j++) {
                     try {
                         if (queuePlan[j][i] == null) {
-                            System.out.print("    O ");
-                        } else {
                             System.out.print("    X ");
+                        } else {
+                            System.out.print("    O ");
                         }
                     } catch (ArrayIndexOutOfBoundsException ex) {
                         System.out.print("      ");//this will add spaces when there is no spaces in a queue
@@ -364,7 +376,7 @@ public class Main {
     }
 
 
-    private static void removeServedCustomer(Scanner scan, String[][] queuePlan, int burgerCount, String[] removedCustomers, int count) {
+    private static int removeServedCustomer(Scanner scan, String[][] queuePlan, int burgerCount, String[] removedCustomers, int count) {
 
         boolean match;
 
@@ -379,16 +391,17 @@ public class Main {
                     System.out.println("Enter the queue :");
                     int queueNo = scan.nextInt();
                     scan.nextLine();
-                    if (queuePlan[queueNo][0] != null) {
-                        removedCustomers[count] = queuePlan[queueNo][0];
+                    if (queuePlan[queueNo - 1][0] != null) {
+                        removedCustomers[count] = queuePlan[queueNo - 1][0];
                         //displaying the removed customer
                         System.out.println(removedCustomers[count] + "has been removed form queue" + queueNo);
 
-                        queuePlan[queueNo][0] = null;//make the place to non-occupied
+                        queuePlan[queueNo - 1][0] = null;//make the place to non-occupied
                         reArrangingQueue(queueNo, 1, queuePlan);//re-arranging the queue after removing the served customer
 
                         burgerCount = burgerCount - 5;
                         count++;
+
                     } else {
                         System.out.println("This queue has no customers to remove");
                     }
@@ -396,7 +409,7 @@ public class Main {
 
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid Input!Please etner a number");
+                System.out.println("Invalid Input!Please enter a number");
                 match = true;
 
             }
@@ -404,6 +417,141 @@ public class Main {
 
         } while (match);
 
+        return burgerCount;
+    }
+
+
+    private static void storeDataToFile(String[][] queuePlan, int burgerCount) {
+
+        //save queue data to file
+        try {
+            //this file is for storage of queue data
+            FileWriter infoWrite = new FileWriter("information.txt");
+            //this file is for storage of burgerCount
+            FileWriter burgerCountWrite = new FileWriter("burgerCount.txt");
+
+
+            //following nested for-loops will store queue data in information.txt
+            for (int i = 0; i < 5; i++) {
+                try {
+                    for (int j = 0; j < 3; j++) {
+                        try {
+                            infoWrite.write(queuePlan[j][i] + " ");
+                        } catch (ArrayIndexOutOfBoundsException ex) {
+                            infoWrite.write(" ");
+                        }
+                    }
+
+
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    infoWrite.write(" ");
+                }
+            }
+
+
+            burgerCountWrite.write(String.valueOf(burgerCount));
+
+
+            infoWrite.close();
+            burgerCountWrite.close();
+            System.out.println("file saved successfully");
+        } catch (IOException e) {
+
+            System.out.println("Error occurred while saving the file");
+        }
+
+
+    }
+
+
+    private static int loadProgram(String[][] queuePlan) {
+
+        int burgerCount = 0;
+        try {
+            int count = 0;//track the names in the names array
+            //this is used to read data form information file
+            FileReader read = new FileReader("information.txt");
+
+
+            Scanner scanner = new Scanner(read);
+            String[] names = scanner.nextLine().split(" ");//split the string and adding to names array
+
+
+            for (int i = 0; i < 5; i++) {
+                try {
+                    for (int j = 0; j < 3; j++) {
+                        try {
+                            if (names[count].equals("null")) {
+                                queuePlan[j][i] = null;
+                            } else {
+                                queuePlan[j][i] = names[count];
+                            }
+
+                            count++;
+                        } catch (ArrayIndexOutOfBoundsException ex) {
+                            //queue ie printed horizontally,this will give arrayIndexoutofbond exception
+                            // as all the queue lengths are not equal
+                            count++;
+                        }
+                    }
+
+
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    //queue ie printed horizontally,this will give ArrayIndexOutofBond exception
+                    // as all the queue lengths are not equal
+                    count++;
+                }
+            }
+
+            scanner.close();
+
+
+        } catch (IOException e) {
+            System.out.println("Error occurred while  loading/locating the file");
+        }
+
+        try {
+            //this is used to read data from burgerCount file
+            FileReader readCount = new FileReader("burgerCount.txt");
+            Scanner scanner1 = new Scanner(readCount);
+            burgerCount = Integer.parseInt(scanner1.next());
+        } catch (IOException exception) {
+            System.out.println("Error occured while  loading the burger count");
+        }
+
+        return burgerCount;
+
+    }
+
+    private static int addBurgersToStock(Scanner scanner){
+        boolean match;
+        int burgers=0;
+        do{
+            match=false;
+
+            try{
+
+                System.out.println("How many Burgers you want to add for the queue :");
+                int additionalBurgers=scanner.nextInt();
+
+                if(additionalBurgers<=50){
+                    burgers= additionalBurgers;
+                }
+                else{
+                    System.out.println("please enter  a number less than 50");
+                    match=true;
+
+
+                }
+
+            }catch (InputMismatchException e){
+                System.out.println("Invalid Input!");
+                match=true;
+            }
+        }while (match);
+
+
+        return  burgers;
 
     }
 
