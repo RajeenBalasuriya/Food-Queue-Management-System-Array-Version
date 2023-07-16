@@ -9,6 +9,9 @@ public class Main {
         //Initialize of scanner object to get inputs
         Scanner scan = new Scanner(System.in);
 
+        //burger count
+        int burgerCount = 50;
+
         //Keeping menu options in array to iterate using a for loop in the displayMenu method
         String[] menuOptions = {
 
@@ -35,6 +38,11 @@ public class Main {
 
         //array will help to reuse details get from VEQ function
         int[] emptyQueues = new int[3];
+
+        //array to store removed customers
+        String[] removedCustomers = new String[20];
+        //track the count of removed customers
+        int count = 0;
 
 
         String choice = displayMenu(menuOptions, scan);//getting the user choice
@@ -70,18 +78,23 @@ public class Main {
                 case "103": {
 
                     removeCustomer(scan, queuePlan);
+                    break;
                     //4 option
                 }
 
                 case "PCQ":
                 case "104": {
-                    //5 option
+                    removeServedCustomer(scan, queuePlan, burgerCount, removedCustomers, count);
+                    break;
+
                 }
 
                 case "VCS":
                 case "105": {
                     //6 option
                     sortCustomers(queuePlan);
+                    break;
+                    
                 }
 
                 case "SPD":
@@ -344,10 +357,54 @@ public class Main {
             if (name == null) {
                 break;
             } else {
-                System.out.println("    " +name);
+                System.out.println("    " + name);
 
             }
         }
+    }
+
+
+    private static void removeServedCustomer(Scanner scan, String[][] queuePlan, int burgerCount, String[] removedCustomers, int count) {
+
+        boolean match;
+
+        do {
+            match = false;
+            try {
+                if (burgerCount == 10) {
+                    System.out.println("Burger stock only has 10 burgers,Please add burgers to stock");
+
+                } else {
+
+                    System.out.println("Enter the queue :");
+                    int queueNo = scan.nextInt();
+                    scan.nextLine();
+                    if (queuePlan[queueNo][0] != null) {
+                        removedCustomers[count] = queuePlan[queueNo][0];
+                        //displaying the removed customer
+                        System.out.println(removedCustomers[count] + "has been removed form queue" + queueNo);
+
+                        queuePlan[queueNo][0] = null;//make the place to non-occupied
+                        reArrangingQueue(queueNo, 1, queuePlan);//re-arranging the queue after removing the served customer
+
+                        burgerCount = burgerCount - 5;
+                        count++;
+                    } else {
+                        System.out.println("This queue has no customers to remove");
+                    }
+
+
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid Input!Please etner a number");
+                match = true;
+
+            }
+
+
+        } while (match);
+
+
     }
 
 
